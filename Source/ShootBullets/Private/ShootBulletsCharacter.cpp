@@ -55,8 +55,9 @@ void AShootBulletsCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AShootBulletsCharacter::MoveRight);
 
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &AShootBulletsCharacter::TouchStarted);
-	PlayerInputComponent->BindTouch(IE_Released, this, &AShootBulletsCharacter::TouchStopped);
+	PlayerInputComponent->BindAction("FireDefault", IE_Pressed, this, &AShootBulletsCharacter::FireDefaultPressed);
+	PlayerInputComponent->BindAction("FireDefault", IE_Released, this, &AShootBulletsCharacter::FireDefaultReleased);
+	PlayerInputComponent->BindAction("FireSpecial", IE_Released, this, &AShootBulletsCharacter::FireSpecialReleased);
 }
 
 void AShootBulletsCharacter::MoveRight(float Value)
@@ -65,14 +66,38 @@ void AShootBulletsCharacter::MoveRight(float Value)
 	AddMovementInput(FVector(0.f,-1.f,0.f), Value);
 }
 
-void AShootBulletsCharacter::TouchStarted(const ETouchIndex::Type FingerIndex, const FVector Location)
+void AShootBulletsCharacter::Tick(float DeltaSeconds)
 {
-	// jump on any touch
-	Jump();
+	Super::Tick(DeltaSeconds);
+
+	if (m_bFireDefaultPressed)
+	{
+		m_fFireDefaultPressTime += DeltaSeconds;
+		m_fFireDefaultPressTime = FMath::Min(m_fFireDefaultPressTime, 3.0f);
+	}
 }
 
-void AShootBulletsCharacter::TouchStopped(const ETouchIndex::Type FingerIndex, const FVector Location)
+void AShootBulletsCharacter::FireDefaultPressed()
 {
-	StopJumping();
+	UE_LOG(LogTemp, Warning, TEXT("%s"), __FUNCTIONW__);
+	
+	m_bFireDefaultPressed = true;
 }
 
+void AShootBulletsCharacter::FireDefaultReleased()
+{
+	UE_LOG(LogTemp, Warning, TEXT("%s : %.2f"), __FUNCTIONW__, m_fFireDefaultPressTime);
+	ResetFireStates();
+}
+
+void AShootBulletsCharacter::FireSpecialReleased()
+{
+	UE_LOG(LogTemp, Warning, TEXT("%s"), __FUNCTIONW__);
+	ResetFireStates();
+}
+
+void AShootBulletsCharacter::ResetFireStates()
+{
+	m_bFireDefaultPressed = false;
+	m_fFireDefaultPressTime = 0.0f;
+}

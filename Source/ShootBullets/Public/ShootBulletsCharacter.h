@@ -24,16 +24,20 @@ protected:
 	/** Called for side to side input */
 	void MoveRight(float Val);
 
-	/** Handle touch inputs. */
-	void TouchStarted(const ETouchIndex::Type FingerIndex, const FVector Location);
-
-	/** Handle touch stop event. */
-	void TouchStopped(const ETouchIndex::Type FingerIndex, const FVector Location);
-
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	// End of APawn interface
 
+	virtual void Tick(float DeltaSeconds) override;
+
+	// Fire Default
+	void FireDefaultPressed();
+	void FireDefaultReleased();
+
+	// Fire Special
+	void FireSpecialReleased();
+
+	void ResetFireStates();;
 
 public:
 	AShootBulletsCharacter();
@@ -42,4 +46,8 @@ public:
 	FORCEINLINE class UCameraComponent* GetSideViewCameraComponent() const { return SideViewCameraComponent; }
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+
+private:
+	bool m_bFireDefaultPressed = false;
+	float m_fFireDefaultPressTime = 0.0f;
 };
