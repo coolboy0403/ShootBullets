@@ -31,4 +31,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = Bullet)
 	class UProjectileMovementComponent* MovementComp;
+
+	UFUNCTION()
+	virtual void OnCollisionDetected(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 };

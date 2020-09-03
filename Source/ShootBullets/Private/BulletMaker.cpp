@@ -2,7 +2,7 @@
 
 
 #include "BulletMaker.h"
-#include "ShootBulletsCharacter.h"
+#include "GameFramework/Actor.h"
 #include "BulletActorNormal.h"
 #include "BulletActorCharge.h"
 #include "BulletActorSplit.h"
@@ -24,20 +24,17 @@ void BulletMaker::ResetCount()
 }
 
 // Bullet Make Helper
-void BulletMaker::MakeBullets(AShootBulletsCharacter* Character, eBulletType Type)
+void BulletMaker::MakeBullets(AActor* Actor, eBulletType Type, float BulletPosGap, float BulletPosZ, const FRotator& AdditionRot)
 {
-	if (nullptr == Character)
+	if (nullptr == Actor)
 		return;
 
-	auto World = Character->GetWorld();
+	auto World = Actor->GetWorld();
 	if (nullptr == World)
 		return;
-	
-	const float BulletPosGap = 20.0f;
-	const float BulletPosZ = 50.0f;
 
-	auto CharLocation = Character->GetActorLocation();
-	auto CharRotaion = Character->GetActorRotation();
+	auto CharLocation = Actor->GetActorLocation();
+	auto CharRotaion = Actor->GetActorRotation();
 
 	FVector SpawnPos = CharLocation;
 
@@ -55,8 +52,9 @@ void BulletMaker::MakeBullets(AShootBulletsCharacter* Character, eBulletType Typ
 	*/
 
 	// All Direction
-	FVector Direction = FRotationMatrix(CharRotaion).GetUnitAxis(EAxis::X);
-	FRotator SpawnRot = CharRotaion;
+	FRotator CalcRotation = CharRotaion + AdditionRot;
+	FVector Direction = FRotationMatrix(CalcRotation).GetUnitAxis(EAxis::X);
+	FRotator SpawnRot = CalcRotation;
 
 	Direction *= BulletPosGap;
 	SpawnPos += Direction;
@@ -79,6 +77,10 @@ void BulletMaker::MakeBullets(AShootBulletsCharacter* Character, eBulletType Typ
 	case BulletMaker::eBulletType::BT_REFLECT:
 		UE_LOG(LogTemp, Warning, TEXT("BT_REFLECT"));
 		World->SpawnActor<ABulletActorReflect>(SpawnPos, SpawnRot);
+		break;
+	case BulletMaker::eBulletType::BT_SUB_NORMAL:
+		UE_LOG(LogTemp, Warning, TEXT("BT_SUB_NORMAL"));
+		World->SpawnActor<ABulletActorNormal>(SpawnPos, SpawnRot);
 		break;
 	default:
 		break;

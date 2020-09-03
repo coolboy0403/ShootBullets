@@ -12,3 +12,8 @@ ABulletActorReflect::~ABulletActorReflect()
 {
 
 }
+
+void ABulletActorReflect::OnCollisionDetected(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+{
+	UE_LOG(LogTemp, Warning, __FUNCTIONW__);
+}

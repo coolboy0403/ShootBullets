@@ -16,12 +16,14 @@ public:
 		BT_CHARGE,
 		BT_SPLIT,
 		BT_REFLECT,
+		BT_MAX,
 
-		BT_MAX
+		BT_SUB_NORMAL,
+		BT_SUB_END,
 	};
 
 public:
-	static void MakeBullets(class AShootBulletsCharacter* Character, eBulletType Type);
+	static void MakeBullets(class AActor* Actor, eBulletType Type, float BulletPosGap = 20.0f, float BulletPosZ = 50.0f, const FRotator& AdditionRot = FRotator::ZeroRotator);
 
 	BulletMaker();
 	~BulletMaker();

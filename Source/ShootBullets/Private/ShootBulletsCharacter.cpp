@@ -86,7 +86,10 @@ void AShootBulletsCharacter::Tick(float DeltaSeconds)
 }
 
 void AShootBulletsCharacter::FireDefaultPressed()
-{	
+{
+	if (IsFireSpecialPressed)
+		return;
+
 	IsFireDefaultPressed = true;
 }
 
