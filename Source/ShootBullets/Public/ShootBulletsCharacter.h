@@ -35,9 +35,11 @@ protected:
 	void FireDefaultReleased();
 
 	// Fire Special
+	void FireSpecialPressed();
 	void FireSpecialReleased();
 
-	void ResetFireStates();;
+	void FireBullet(int BulletType);
+	void ResetFireStates();
 
 public:
 	AShootBulletsCharacter();
@@ -48,6 +50,14 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 private:
-	bool m_bFireDefaultPressed = false;
-	float m_fFireDefaultPressTime = 0.0f;
+	const static float ChargeTimeMax;
+
+	UPROPERTY(VisibleAnywhere, Category = Fire)
+	bool IsFireDefaultPressed;
+
+	UPROPERTY(VisibleAnywhere, Category = Fire)
+	float FireDefaultPressTime = 0.0f;
+
+	UPROPERTY(VisibleAnywhere, Category = Fire)
+	bool IsFireSpecialPressed;
 };

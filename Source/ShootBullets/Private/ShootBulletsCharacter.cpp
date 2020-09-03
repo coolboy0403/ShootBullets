@@ -6,6 +6,9 @@
 #include "Components/InputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "BulletMaker.h"
+
+const float AShootBulletsCharacter::ChargeTimeMax = 3.0f;
 
 AShootBulletsCharacter::AShootBulletsCharacter()
 {
@@ -41,6 +44,10 @@ AShootBulletsCharacter::AShootBulletsCharacter()
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 	GetCharacterMovement()->MaxFlySpeed = 600.f;
 
+	IsFireDefaultPressed = false;
+	IsFireSpecialPressed = false;
+	FireDefaultPressTime = 0.0f;
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
@@ -57,6 +64,7 @@ void AShootBulletsCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 	PlayerInputComponent->BindAction("FireDefault", IE_Pressed, this, &AShootBulletsCharacter::FireDefaultPressed);
 	PlayerInputComponent->BindAction("FireDefault", IE_Released, this, &AShootBulletsCharacter::FireDefaultReleased);
+	PlayerInputComponent->BindAction("FireSpecial", IE_Released, this, &AShootBulletsCharacter::FireSpecialPressed);
 	PlayerInputComponent->BindAction("FireSpecial", IE_Released, this, &AShootBulletsCharacter::FireSpecialReleased);
 }
 
@@ -70,34 +78,61 @@ void AShootBulletsCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (m_bFireDefaultPressed)
+	if (IsFireDefaultPressed)
 	{
-		m_fFireDefaultPressTime += DeltaSeconds;
-		m_fFireDefaultPressTime = FMath::Min(m_fFireDefaultPressTime, 3.0f);
+		FireDefaultPressTime += DeltaSeconds;
+		FireDefaultPressTime = FMath::Min(FireDefaultPressTime, ChargeTimeMax);
 	}
 }
 
 void AShootBulletsCharacter::FireDefaultPressed()
-{
-	UE_LOG(LogTemp, Warning, TEXT("%s"), __FUNCTIONW__);
-	
-	m_bFireDefaultPressed = true;
+{	
+	IsFireDefaultPressed = true;
 }
 
 void AShootBulletsCharacter::FireDefaultReleased()
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s : %.2f"), __FUNCTIONW__, m_fFireDefaultPressTime);
-	ResetFireStates();
+	if (false == IsFireDefaultPressed)
+		return;
+	
+	if (FMath::IsNearlyEqual(FireDefaultPressTime, ChargeTimeMax))
+	{
+		FireBullet((int)BulletMaker::eBulletType::BT_CHARGE);
+	}
+	else
+	{
+		FireBullet((int)BulletMaker::eBulletType::BT_NORMAL);
+	}
+}
+
+void AShootBulletsCharacter::FireSpecialPressed()
+{
+	IsFireSpecialPressed = true;
+
+	if (IsFireDefaultPressed && FireDefaultPressTime < 1.0f)
+	{
+		FireBullet((int)BulletMaker::eBulletType::BT_SPLIT);
+	}
 }
 
 void AShootBulletsCharacter::FireSpecialReleased()
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s"), __FUNCTIONW__);
+	if (false == IsFireSpecialPressed)
+		return;
+
+	FireBullet((int)BulletMaker::eBulletType::BT_REFLECT);
+}
+
+void AShootBulletsCharacter::FireBullet(int BulletType)
+{
+	BulletMaker::MakeBullets(this, (BulletMaker::eBulletType)BulletType);
 	ResetFireStates();
 }
 
 void AShootBulletsCharacter::ResetFireStates()
 {
-	m_bFireDefaultPressed = false;
-	m_fFireDefaultPressTime = 0.0f;
+	IsFireDefaultPressed = false;
+	IsFireSpecialPressed = false;
+
+	FireDefaultPressTime = 0.0f;
 }
