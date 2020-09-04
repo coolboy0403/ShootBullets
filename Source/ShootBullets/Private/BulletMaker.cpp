@@ -24,7 +24,7 @@ void BulletMaker::ResetCount()
 }
 
 // Bullet Make Helper
-void BulletMaker::MakeBullets(AActor* Actor, eBulletType Type, float BulletPosGap, float BulletPosZ, const FRotator& AdditionRot)
+void BulletMaker::MakeBullets(AActor* Actor, eBulletType Type, float BulletPosGap, float BulletPosZ, const FRotator& AdditionRot, AActor* Owner)
 {
 	if (nullptr == Actor)
 		return;
@@ -59,28 +59,26 @@ void BulletMaker::MakeBullets(AActor* Actor, eBulletType Type, float BulletPosGa
 	Direction *= BulletPosGap;
 	SpawnPos += Direction;
 	SpawnPos.Z += BulletPosZ;
+	
+	FActorSpawnParameters Params;
+	Params.Owner = (Owner == nullptr) ? Actor : Owner;
 
 	switch (Type)
 	{
 	case BulletMaker::eBulletType::BT_NORMAL:
-		UE_LOG(LogTemp, Warning, TEXT("BT_NORMAL"));
-		World->SpawnActor<ABulletActorNormal>(SpawnPos, SpawnRot);
+		World->SpawnActor<ABulletActorNormal>(SpawnPos, SpawnRot, Params);
 		break;
 	case BulletMaker::eBulletType::BT_CHARGE:
-		UE_LOG(LogTemp, Warning, TEXT("BT_CHARGE"));
-		World->SpawnActor<ABulletActorCharge>(SpawnPos, SpawnRot);
+		World->SpawnActor<ABulletActorCharge>(SpawnPos, SpawnRot, Params);
 		break;
 	case BulletMaker::eBulletType::BT_SPLIT:
-		UE_LOG(LogTemp, Warning, TEXT("BT_SPLIT"));
-		World->SpawnActor<ABulletActorSplit>(SpawnPos, SpawnRot);
+		World->SpawnActor<ABulletActorSplit>(SpawnPos, SpawnRot, Params);
 		break;
 	case BulletMaker::eBulletType::BT_REFLECT:
-		UE_LOG(LogTemp, Warning, TEXT("BT_REFLECT"));
-		World->SpawnActor<ABulletActorReflect>(SpawnPos, SpawnRot);
+		World->SpawnActor<ABulletActorReflect>(SpawnPos, SpawnRot, Params);
 		break;
 	case BulletMaker::eBulletType::BT_SUB_NORMAL:
-		UE_LOG(LogTemp, Warning, TEXT("BT_SUB_NORMAL"));
-		World->SpawnActor<ABulletActorNormal>(SpawnPos, SpawnRot);
+		World->SpawnActor<ABulletActorNormal>(SpawnPos, SpawnRot, Params);
 		break;
 	default:
 		break;

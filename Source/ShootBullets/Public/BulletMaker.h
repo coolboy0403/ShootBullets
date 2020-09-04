@@ -23,7 +23,7 @@ public:
 	};
 
 public:
-	static void MakeBullets(class AActor* Actor, eBulletType Type, float BulletPosGap = 20.0f, float BulletPosZ = 50.0f, const FRotator& AdditionRot = FRotator::ZeroRotator);
+	static void MakeBullets(class AActor* Actor, eBulletType Type, float BulletPosGap = 20.0f, float BulletPosZ = 50.0f, const FRotator& AdditionRot = FRotator::ZeroRotator, class AActor* Owner = nullptr);
 
 	BulletMaker();
 	~BulletMaker();

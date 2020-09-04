@@ -42,7 +42,7 @@ void ABulletActorSplit::EndPlay(EEndPlayReason::Type EndPlayReason)
 				return;
 
 			auto ActorRotation = Arrow->GetRelativeRotation();
-			BulletMaker::MakeBullets(this, BulletMaker::eBulletType::BT_SUB_NORMAL, 0.0f, 0.0f, ActorRotation);
+			BulletMaker::MakeBullets(this, BulletMaker::eBulletType::BT_SUB_NORMAL, 0.0f, 0.0f, ActorRotation, GetOwner());
 		};
 
 		MakeSubBullet(PositiveArrowComp);
@@ -53,7 +53,9 @@ void ABulletActorSplit::EndPlay(EEndPlayReason::Type EndPlayReason)
 void ABulletActorSplit::OnCollisionDetected(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
 	UE_LOG(LogTemp, Warning, __FUNCTIONW__);
-	IsCollisionDetected = true;
+	
+	if (nullptr != OtherActor && GetOwner() != OtherActor)
+		IsCollisionDetected = true;
 	
 	Super::OnCollisionDetected(HitComponent, OtherActor, OtherComponent, NormalImpulse, Hit);
 }

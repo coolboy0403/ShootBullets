@@ -42,6 +42,7 @@ ABulletActorBase::ABulletActorBase()
 	MovementComp->InitialSpeed = 100.0f;
 	MovementComp->MaxSpeed = 100.0f;
 	MovementComp->bRotationFollowsVelocity = true;
+	MovementComp->bShouldBounce = false;
 	MovementComp->ProjectileGravityScale = 0.0f;
 }
 
@@ -60,11 +61,20 @@ void ABulletActorBase::BeginPlay()
 		return;
 
 	FVector Direction = FRotationMatrix(GetActorRotation()).GetUnitAxis(EAxis::X);
+	ChangeDirection(Direction);
+}
+
+void ABulletActorBase::ChangeDirection(const FVector& Direction)
+{
 	MovementComp->Velocity = Direction * MovementComp->InitialSpeed;
 }
 
 void ABulletActorBase::OnCollisionDetected(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
 	UE_LOG(LogTemp, Warning, __FUNCTIONW__);
+	
+	if (GetOwner() == OtherActor)
+		return;
+	
 	Destroy();
 }
