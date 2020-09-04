@@ -1,14 +1,15 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "ShootBulletsCharacter.h"
+#include "ShootBulletsCharacterWidget.h"
+#include "ShootBulletsMaker.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/WidgetComponent.h"
-#include "ShootingBulletsCharacterWidget.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "BulletMaker.h"
+
 
 const float AShootBulletsCharacter::ChargeTimeMax = 3.0f;
 
@@ -59,13 +60,11 @@ AShootBulletsCharacter::AShootBulletsCharacter()
 	ChargeGaugeWidget->SetupAttachment(GetMesh());
 	ChargeGaugeWidget->SetRelativeLocation(FVector(0.0f, 0.0f, 200.0f));
 	ChargeGaugeWidget->SetWidgetSpace(EWidgetSpace::Screen);
-	ChargeGaugeWidget->SetVisibility(false);
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> ConstructorGaugeWidget(TEXT("/Game/UI/BulletChargeGauge"));
+	static ConstructorHelpers::FClassFinder<UShootBulletsCharacterWidget> ConstructorGaugeWidget(TEXT("/Game/UI/BulletChargeGauge"));
 	if (ConstructorGaugeWidget.Succeeded())
 	{
-		ChargeGaugeWidget->SetWidgetClass(ConstructorGaugeWidget.Class);
-		ChargeGaugeWidget->SetDrawSize(FVector2D(200.0f, 50.0f));
+		ChargeGaugeWidgetClass = ConstructorGaugeWidget.Class;
 	}
 
 	IsFireDefaultPressed = false;
@@ -107,7 +106,8 @@ void AShootBulletsCharacter::Tick(float DeltaSeconds)
 		FireDefaultPressTime += DeltaSeconds;
 		FireDefaultPressTime = FMath::Min(FireDefaultPressTime, ChargeTimeMax);
 
-		OnChargeBulletTimeUpdated.Execute(FireDefaultPressTime);
+		if (OnChargeBulletTimeUpdated.IsBound())
+			OnChargeBulletTimeUpdated.Broadcast(FireDefaultPressTime);
 	}
 }
 
@@ -115,14 +115,18 @@ void AShootBulletsCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (nullptr == ChargeGaugeWidget)
+	if (nullptr == ChargeGaugeWidgetClass)
 		return;
 
-	auto ChargeWidget = Cast<UShootingBulletsCharacterWidget>(ChargeGaugeWidget->GetUserWidgetObject());
-	if (nullptr == ChargeWidget)
-		return;
-	
-	ChargeWidget->SetupDelegate(this);
+	if (nullptr == ChargeGaugeWidgetInstance)
+	{
+		ChargeGaugeWidgetInstance = CreateWidget<UShootBulletsCharacterWidget>(GetWorld(), ChargeGaugeWidgetClass);
+		ChargeGaugeWidget->SetWidget(ChargeGaugeWidgetInstance);
+		ChargeGaugeWidget->SetDrawSize(FVector2D(200.0f, 50.0f));
+		ChargeGaugeWidget->SetVisibility(false);
+
+		ChargeGaugeWidgetInstance->SetupDelegate(this);
+	}
 }
 
 void AShootBulletsCharacter::FireDefaultPressed()
@@ -141,11 +145,11 @@ void AShootBulletsCharacter::FireDefaultReleased()
 	
 	if (FMath::IsNearlyEqual(FireDefaultPressTime, ChargeTimeMax))
 	{
-		FireBullet((int)BulletMaker::eBulletType::BT_CHARGE);
+		FireBullet((int)UShootBulletsMaker::EBulletType::BT_CHARGE);
 	}
 	else
 	{
-		FireBullet((int)BulletMaker::eBulletType::BT_NORMAL);
+		FireBullet((int)UShootBulletsMaker::EBulletType::BT_NORMAL);
 	}
 }
 
@@ -155,7 +159,7 @@ void AShootBulletsCharacter::FireSpecialPressed()
 
 	if (IsFireDefaultPressed && FireDefaultPressTime < 1.0f)
 	{
-		FireBullet((int)BulletMaker::eBulletType::BT_SPLIT);
+		FireBullet((int)UShootBulletsMaker::EBulletType::BT_SPLIT);
 	}
 }
 
@@ -164,12 +168,12 @@ void AShootBulletsCharacter::FireSpecialReleased()
 	if (false == IsFireSpecialPressed)
 		return;
 
-	FireBullet((int)BulletMaker::eBulletType::BT_REFLECT);
+	FireBullet((int)UShootBulletsMaker::EBulletType::BT_REFLECT);
 }
 
 void AShootBulletsCharacter::FireBullet(int BulletType)
 {
-	BulletMaker::MakeBullets(this, (BulletMaker::eBulletType)BulletType);
+	UShootBulletsMaker::MakeBullets(this, (UShootBulletsMaker::EBulletType)BulletType);
 	ResetFireStates();
 }
 
@@ -179,6 +183,9 @@ void AShootBulletsCharacter::ResetFireStates()
 	IsFireSpecialPressed = false;
 
 	FireDefaultPressTime = 0.0f;
+
+	if (OnChargeBulletTimeUpdated.IsBound())
+		OnChargeBulletTimeUpdated.Broadcast(0.0f);
 
 	ChargeGaugeWidget->SetVisibility(false);
 }

@@ -3,7 +3,7 @@
 
 #include "BulletActorSplit.h"
 #include "Components/ArrowComponent.h"
-#include "BulletMaker.h"
+#include "ShootBulletsMaker.h"
 
 ABulletActorSplit::ABulletActorSplit()
 	: IsCollisionDetected(false)
@@ -42,7 +42,7 @@ void ABulletActorSplit::EndPlay(EEndPlayReason::Type EndPlayReason)
 				return;
 
 			auto ActorRotation = Arrow->GetRelativeRotation();
-			BulletMaker::MakeBullets(this, BulletMaker::eBulletType::BT_SUB_NORMAL, 0.0f, 0.0f, ActorRotation, GetOwner());
+			UShootBulletsMaker::MakeBullets(this, UShootBulletsMaker::EBulletType::BT_SUB_NORMAL, 0.0f, 0.0f, ActorRotation, GetOwner());
 		};
 
 		MakeSubBullet(PositiveArrowComp);

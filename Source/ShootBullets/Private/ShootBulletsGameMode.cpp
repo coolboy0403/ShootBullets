@@ -3,6 +3,7 @@
 #include "ShootBulletsGameMode.h"
 #include "ShootBulletsCharacter.h"
 #include "UObject/ConstructorHelpers.h"
+#include "ShootBulletsPlayerController.h"
 
 AShootBulletsGameMode::AShootBulletsGameMode()
 {
@@ -12,4 +13,6 @@ AShootBulletsGameMode::AShootBulletsGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+
+	PlayerControllerClass = AShootBulletsPlayerController::StaticClass();
 }

@@ -6,7 +6,7 @@
 #include "GameFramework/Character.h"
 #include "ShootBulletsCharacter.generated.h"
 
-DECLARE_DELEGATE_OneParam(FOnChargeBulletTimeDelegate, const float&);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnChargeBulletTimeDelegate, const float&);
 
 UCLASS(config=Game)
 class AShootBulletsCharacter : public ACharacter
@@ -65,6 +65,12 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Fire)
 	bool IsFireSpecialPressed;
 
-	UPROPERTY(VisibleAnywhere, Category = Fire)
+	UPROPERTY(VisibleAnywhere, Category = Widget)
 	class UWidgetComponent* ChargeGaugeWidget;
+
+	UPROPERTY(VisibleAnywhere, Category = Widget)
+	TSubclassOf<class UShootBulletsCharacterWidget> ChargeGaugeWidgetClass;
+
+	UPROPERTY(VisibleAnywhere, Category = Widget)
+	class UShootBulletsCharacterWidget* ChargeGaugeWidgetInstance;
 };

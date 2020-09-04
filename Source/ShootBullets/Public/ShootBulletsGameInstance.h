@@ -9,6 +9,7 @@
 /**
  * 
  */
+
 UCLASS()
 class SHOOTBULLETS_API UShootBulletsGameInstance : public UGameInstance
 {
@@ -17,6 +18,10 @@ class SHOOTBULLETS_API UShootBulletsGameInstance : public UGameInstance
 public:
 	UShootBulletsGameInstance();
 	void Init() override;
-	
 
+	class UShootBulletsMaker* GetBulletInfo() const;
+
+protected:
+	UPROPERTY(VisibleAnywhere, Category = Info)
+	class UShootBulletsMaker* ShootBulletsInfo;
 };
