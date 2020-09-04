@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "ShootBulletsCharacter.generated.h"
 
+DECLARE_DELEGATE_OneParam(FOnChargeBulletTimeDelegate, const float&);
+
 UCLASS(config=Game)
 class AShootBulletsCharacter : public ACharacter
 {
@@ -29,6 +31,7 @@ protected:
 	// End of APawn interface
 
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void BeginPlay() override;
 
 	// Fire Default
 	void FireDefaultPressed();
@@ -49,9 +52,10 @@ public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
-private:
 	const static float ChargeTimeMax;
+	FOnChargeBulletTimeDelegate OnChargeBulletTimeUpdated;
 
+private:
 	UPROPERTY(VisibleAnywhere, Category = Fire)
 	bool IsFireDefaultPressed;
 
@@ -60,4 +64,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Fire)
 	bool IsFireSpecialPressed;
+
+	UPROPERTY(VisibleAnywhere, Category = Fire)
+	class UWidgetComponent* ChargeGaugeWidget;
 };

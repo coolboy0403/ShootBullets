@@ -4,6 +4,8 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/WidgetComponent.h"
+#include "ShootingBulletsCharacterWidget.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "BulletMaker.h"
@@ -22,6 +24,9 @@ AShootBulletsCharacter::AShootBulletsCharacter()
 
 	// Create a camera boom attached to the root (capsule)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	if (nullptr == CameraBoom)
+		return;
+
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->SetUsingAbsoluteRotation(true); // Rotation of the character should not affect rotation of boom
 	CameraBoom->bDoCollisionTest = false;
@@ -31,6 +36,9 @@ AShootBulletsCharacter::AShootBulletsCharacter()
 
 	// Create a camera and attach to boom
 	SideViewCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("SideViewCamera"));
+	if (nullptr == SideViewCameraComponent)
+		return;
+
 	SideViewCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	SideViewCameraComponent->bUsePawnControlRotation = false; // We don't want the controller rotating the camera
 
@@ -43,6 +51,22 @@ AShootBulletsCharacter::AShootBulletsCharacter()
 	GetCharacterMovement()->GroundFriction = 3.f;
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 	GetCharacterMovement()->MaxFlySpeed = 600.f;
+
+	ChargeGaugeWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("BulletChargeWidget"));
+	if (nullptr == ChargeGaugeWidget)
+		return;
+
+	ChargeGaugeWidget->SetupAttachment(GetMesh());
+	ChargeGaugeWidget->SetRelativeLocation(FVector(0.0f, 0.0f, 200.0f));
+	ChargeGaugeWidget->SetWidgetSpace(EWidgetSpace::Screen);
+	ChargeGaugeWidget->SetVisibility(false);
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> ConstructorGaugeWidget(TEXT("/Game/UI/BulletChargeGauge"));
+	if (ConstructorGaugeWidget.Succeeded())
+	{
+		ChargeGaugeWidget->SetWidgetClass(ConstructorGaugeWidget.Class);
+		ChargeGaugeWidget->SetDrawSize(FVector2D(200.0f, 50.0f));
+	}
 
 	IsFireDefaultPressed = false;
 	IsFireSpecialPressed = false;
@@ -82,7 +106,23 @@ void AShootBulletsCharacter::Tick(float DeltaSeconds)
 	{
 		FireDefaultPressTime += DeltaSeconds;
 		FireDefaultPressTime = FMath::Min(FireDefaultPressTime, ChargeTimeMax);
+
+		OnChargeBulletTimeUpdated.Execute(FireDefaultPressTime);
 	}
+}
+
+void AShootBulletsCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (nullptr == ChargeGaugeWidget)
+		return;
+
+	auto ChargeWidget = Cast<UShootingBulletsCharacterWidget>(ChargeGaugeWidget->GetUserWidgetObject());
+	if (nullptr == ChargeWidget)
+		return;
+	
+	ChargeWidget->SetupDelegate(this);
 }
 
 void AShootBulletsCharacter::FireDefaultPressed()
@@ -91,6 +131,7 @@ void AShootBulletsCharacter::FireDefaultPressed()
 		return;
 
 	IsFireDefaultPressed = true;
+	ChargeGaugeWidget->SetVisibility(true);
 }
 
 void AShootBulletsCharacter::FireDefaultReleased()
@@ -138,4 +179,6 @@ void AShootBulletsCharacter::ResetFireStates()
 	IsFireSpecialPressed = false;
 
 	FireDefaultPressTime = 0.0f;
+
+	ChargeGaugeWidget->SetVisibility(false);
 }
