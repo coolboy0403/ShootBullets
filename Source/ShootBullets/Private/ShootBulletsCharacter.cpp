@@ -173,7 +173,13 @@ void AShootBulletsCharacter::FireSpecialReleased()
 
 void AShootBulletsCharacter::FireBullet(int BulletType)
 {
-	UShootBulletsMaker::MakeBullets(this, (UShootBulletsMaker::EBulletType)BulletType);
+	const float DirOffset = 20.0f;
+	const float Zoffset = 50.0f;
+
+	auto MeshLocation = GetMesh()->GetRelativeLocation();
+	float BulletOffsetZ = MeshLocation.Z + Zoffset;
+
+	UShootBulletsMaker::MakeBullets(this, (UShootBulletsMaker::EBulletType)BulletType, DirOffset, BulletOffsetZ);
 	ResetFireStates();
 }
 

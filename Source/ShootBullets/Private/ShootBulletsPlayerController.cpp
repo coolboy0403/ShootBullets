@@ -22,6 +22,8 @@ void AShootBulletsPlayerController::BeginPlay()
 	FInputModeGameAndUI InputMode;
 	SetInputMode(InputMode);
 
+	bShowMouseCursor = true;
+
 	if (nullptr == InGameWidgetClass)
 		return;
 

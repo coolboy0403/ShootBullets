@@ -50,12 +50,9 @@ void ABulletActorSplit::EndPlay(EEndPlayReason::Type EndPlayReason)
 	}
 }
 
-void ABulletActorSplit::OnCollisionDetected(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+void ABulletActorSplit::OnCollisionDetected()
 {
-	UE_LOG(LogTemp, Warning, __FUNCTIONW__);
-	
-	if (nullptr != OtherActor && GetOwner() != OtherActor)
-		IsCollisionDetected = true;
-	
-	Super::OnCollisionDetected(HitComponent, OtherActor, OtherComponent, NormalImpulse, Hit);
+	IsCollisionDetected = true;
+
+	Super::OnCollisionDetected();
 }

@@ -57,7 +57,7 @@ int UShootBulletsMaker::GetBulletCount(EBulletType Type)
 }
 
 // Bullet Make Helper
-void UShootBulletsMaker::MakeBullets(AActor* Actor, EBulletType Type, float BulletPosGap, float BulletPosZ, const FRotator& AdditionRot, AActor* Owner)
+void UShootBulletsMaker::MakeBullets(AActor* Actor, EBulletType Type, const float& BulletDirOffset, const float& BulletOffsetZ, const FRotator& AdditionRot, AActor* Owner)
 {
 	if (nullptr == Actor)
 		return;
@@ -70,28 +70,11 @@ void UShootBulletsMaker::MakeBullets(AActor* Actor, EBulletType Type, float Bull
 	auto CharRotaion = Actor->GetActorRotation();
 
 	FVector SpawnPos = CharLocation;
-
-	/*
-	// Only Two Dirrection
-	FVector Direction = FVector(1.0f, 0.0f, 0.0f);
-	FRotator SpawnRot = FRotator(0.0f, 90.0f, 0.0f);
-
-	// Only Two Dir;
-	if (CharRotaion.Yaw < 0.0f)
-	{
-		Direction = FVector(-1.0f, 0.0f, 0.0f);
-		SpawnRot = FRotator(0.0f, -90.0f, 0.0f);
-	}
-	*/
-
-	// All Direction
-	FRotator CalcRotation = CharRotaion + AdditionRot;
-	FVector Direction = FRotationMatrix(CalcRotation).GetUnitAxis(EAxis::X);
-	FRotator SpawnRot = CalcRotation;
-
-	Direction *= BulletPosGap;
-	SpawnPos += Direction;
-	SpawnPos.Z += BulletPosZ;
+	FRotator SpawnRot = CharRotaion + AdditionRot;
+	FVector SpawnDirection = FRotationMatrix(SpawnRot).GetUnitAxis(EAxis::X);
+	
+	SpawnPos += SpawnDirection * BulletDirOffset;
+	SpawnPos.Z += BulletOffsetZ;
 
 	FActorSpawnParameters Params;
 	Params.Owner = (Owner == nullptr) ? Actor : Owner;
@@ -99,24 +82,35 @@ void UShootBulletsMaker::MakeBullets(AActor* Actor, EBulletType Type, float Bull
 	switch (Type)
 	{
 	case UShootBulletsMaker::EBulletType::BT_NORMAL:
+	{
 		World->SpawnActor<ABulletActorNormal>(SpawnPos, SpawnRot, Params);
-		break;
+	} break;
+
 	case UShootBulletsMaker::EBulletType::BT_CHARGE:
+	{
 		World->SpawnActor<ABulletActorCharge>(SpawnPos, SpawnRot, Params);
-		break;
+	} break;
+
 	case UShootBulletsMaker::EBulletType::BT_SPLIT:
+	{
 		World->SpawnActor<ABulletActorSplit>(SpawnPos, SpawnRot, Params);
-		break;
+	} break;
+
 	case UShootBulletsMaker::EBulletType::BT_REFLECT:
+	{
 		World->SpawnActor<ABulletActorReflect>(SpawnPos, SpawnRot, Params);
-		break;
+	} break;
+
 	case UShootBulletsMaker::EBulletType::BT_SUB_NORMAL:
+	{
+		FVector CharDirection = FRotationMatrix(CharRotaion).GetUnitAxis(EAxis::X);
+		SpawnPos -= CharDirection * ABulletActorNormal::ArrowHalfLength;
 		World->SpawnActor<ABulletActorNormal>(SpawnPos, SpawnRot, Params);
-		break;
+	} break;
+
 	default:
 		break;
 	}
-
 
 	auto GameInstance = Cast<UShootBulletsGameInstance>(World->GetGameInstance());
 	if (nullptr == GameInstance)

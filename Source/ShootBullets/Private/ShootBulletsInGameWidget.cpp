@@ -8,13 +8,23 @@
 #include "Components/ProgressBar.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
+#include "Components/Border.h"
 
 void UShootBulletsInGameWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
 	if (nullptr != ChargeProgressBar)
+	{
 		ChargeProgressBar->SetPercent(0.0f);
+		ChargeProgressBar->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	if (nullptr != ChargeBorder)
+	{
+		ChargeBorder->SetBrushColor(FLinearColor::White);
+		ChargeBorder->SetVisibility(ESlateVisibility::Hidden);
+	}
 
 	if (nullptr != ResetCntButton)
 		ResetCntButton->OnClicked.AddDynamic(this, &UShootBulletsInGameWidget::OnResetButtonClicked);
@@ -34,12 +44,25 @@ void UShootBulletsInGameWidget::NativeConstruct()
 
 void UShootBulletsInGameWidget::SetupChargeGaugeDelegate(class AShootBulletsCharacter* Character)
 {
-	if (nullptr == Character || nullptr == ChargeProgressBar)
+	if (nullptr == Character || nullptr == ChargeProgressBar || nullptr == ChargeBorder)
 		return;
 
 	Character->OnChargeBulletTimeUpdated.AddLambda([&](const float& ChargeTime)
 	{
 		ChargeProgressBar->SetPercent(ChargeTime / AShootBulletsCharacter::ChargeTimeMax);
+
+		FLinearColor ContentColor = FLinearColor::White;
+		if (FMath::IsNearlyEqual(ChargeTime, AShootBulletsCharacter::ChargeTimeMax))
+			ContentColor = FLinearColor::Red;
+
+		ChargeBorder->SetBrushColor(ContentColor);
+
+		ESlateVisibility Visibility = ESlateVisibility::Visible;
+		if (FMath::IsNearlyEqual(ChargeTime, 0.0f))
+			Visibility = ESlateVisibility::Hidden;
+
+		ChargeBorder->SetVisibility(Visibility);
+		ChargeProgressBar->SetVisibility(Visibility);
 	});
 }
 

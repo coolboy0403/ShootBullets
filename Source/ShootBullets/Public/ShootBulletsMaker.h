@@ -35,7 +35,7 @@ public:
 	virtual ~UShootBulletsMaker();
 
 public:
-	static void MakeBullets(class AActor* Actor, EBulletType Type, float BulletPosGap = 20.0f, float BulletPosZ = 50.0f, const FRotator& AdditionRot = FRotator::ZeroRotator, class AActor* Owner = nullptr);
+	static void MakeBullets(class AActor* Actor, EBulletType Type, const float& BulletDirOffset, const float& BulletOffsetZ, const FRotator& AdditionRot = FRotator::ZeroRotator, class AActor* Owner = nullptr);
 	void ResetCount();
 
 	void AddBulletCount(EBulletType Type);

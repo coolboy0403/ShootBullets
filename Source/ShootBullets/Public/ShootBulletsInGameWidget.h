@@ -45,4 +45,7 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	class UProgressBar* ChargeProgressBar;
+
+	UPROPERTY(meta = (BindWidget))
+	class UBorder* ChargeBorder;
 };

@@ -19,5 +19,5 @@ public:
 	virtual ~ABulletActorReflect();
 
 protected:
-	virtual void OnCollisionDetected(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit) override;
+	virtual void OnCollisionDetected() override;
 };

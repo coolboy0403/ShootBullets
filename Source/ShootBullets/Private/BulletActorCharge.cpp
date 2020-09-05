@@ -5,8 +5,8 @@
 
 ABulletActorCharge::ABulletActorCharge()
 {
-	ArrowScale = 3.0f;
 	InitialLifeSpan = 5.0f;
+	ArrowScale = 3.0f;
 }
 
 ABulletActorCharge::~ABulletActorCharge()

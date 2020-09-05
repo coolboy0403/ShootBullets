@@ -5,8 +5,7 @@
 
 ABulletActorNormal::ABulletActorNormal()
 {
-	ArrowScale = 1.0f;
-	ArrowColor = FLinearColor::Red;
+
 }
 
 ABulletActorNormal::~ABulletActorNormal()

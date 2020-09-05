@@ -21,7 +21,7 @@ public:
 protected:
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
-	virtual void OnCollisionDetected(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit) override;
+	virtual void OnCollisionDetected() override;
 private:
 	bool IsCollisionDetected;
 
