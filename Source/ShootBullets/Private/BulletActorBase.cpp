@@ -48,11 +48,10 @@ ABulletActorBase::ABulletActorBase()
 	MovementComp->ProjectileGravityScale = 0.0f;
 }
 
-// Called when the game starts or when spawned
-void ABulletActorBase::BeginPlay()
+void ABulletActorBase::PostInitializeComponents()
 {
-	Super::BeginPlay();
-	
+	Super::PostInitializeComponents();
+
 	FVector Direction = FRotationMatrix(GetActorRotation()).GetUnitAxis(EAxis::X);
 	SetActorLocation(GetActorLocation() + Direction * ArrowHalfLength * ArrowScale);
 

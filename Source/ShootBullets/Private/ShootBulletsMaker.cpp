@@ -78,7 +78,8 @@ void UShootBulletsMaker::MakeBullets(AActor* Actor, EBulletType Type, const floa
 
 	FActorSpawnParameters Params;
 	Params.Owner = (Owner == nullptr) ? Actor : Owner;
-	
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding;
+
 	switch (Type)
 	{
 	case UShootBulletsMaker::EBulletType::BT_NORMAL:

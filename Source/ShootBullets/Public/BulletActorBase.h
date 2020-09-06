@@ -19,8 +19,7 @@ public:
 	ABulletActorBase();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;
 
 	virtual void ChangeDirection(const FVector& Direction);
 
