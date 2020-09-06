@@ -17,6 +17,11 @@ void UShootBulletsCharacterWidget::SetupDelegate(AShootBulletsCharacter* Charact
 
 	Character->OnChargeBulletTimeUpdated.AddLambda([&](const float& ChargeTime)
 	{
+		FLinearColor BarColor = FLinearColor::Red;
+		if (ChargeTime < 1.0f)
+			BarColor = FLinearColor::Yellow;
+
+		ChargeProgressBar->SetFillColorAndOpacity(BarColor);
 		ChargeProgressBar->SetPercent(ChargeTime / AShootBulletsCharacter::ChargeTimeMax);
 	});
 }

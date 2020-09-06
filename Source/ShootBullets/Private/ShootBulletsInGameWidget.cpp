@@ -53,9 +53,15 @@ void UShootBulletsInGameWidget::SetupChargeGaugeDelegate(class AShootBulletsChar
 
 		FLinearColor ContentColor = FLinearColor::White;
 		if (FMath::IsNearlyEqual(ChargeTime, AShootBulletsCharacter::ChargeTimeMax))
-			ContentColor = FLinearColor::Red;
+			ContentColor = FLinearColor::Yellow;
 
 		ChargeBorder->SetBrushColor(ContentColor);
+
+		FLinearColor BarColor = FLinearColor::Red;
+		if (ChargeTime < 1.0f)
+			BarColor = FLinearColor::Yellow;
+
+		ChargeProgressBar->SetFillColorAndOpacity(BarColor);
 
 		ESlateVisibility Visibility = ESlateVisibility::Visible;
 		if (FMath::IsNearlyEqual(ChargeTime, 0.0f))

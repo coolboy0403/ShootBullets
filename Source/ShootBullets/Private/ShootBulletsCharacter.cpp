@@ -87,7 +87,8 @@ void AShootBulletsCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 	PlayerInputComponent->BindAction("FireDefault", IE_Pressed, this, &AShootBulletsCharacter::FireDefaultPressed);
 	PlayerInputComponent->BindAction("FireDefault", IE_Released, this, &AShootBulletsCharacter::FireDefaultReleased);
-	PlayerInputComponent->BindAction("FireSpecial", IE_Released, this, &AShootBulletsCharacter::FireSpecialPressed);
+	
+	PlayerInputComponent->BindAction("FireSpecial", IE_Pressed, this, &AShootBulletsCharacter::FireSpecialPressed);
 	PlayerInputComponent->BindAction("FireSpecial", IE_Released, this, &AShootBulletsCharacter::FireSpecialReleased);
 }
 
@@ -165,7 +166,7 @@ void AShootBulletsCharacter::FireSpecialPressed()
 
 void AShootBulletsCharacter::FireSpecialReleased()
 {
-	if (false == IsFireSpecialPressed)
+	if (false == IsFireSpecialPressed || IsFireDefaultPressed)
 		return;
 
 	FireBullet((int)UShootBulletsMaker::EBulletType::BT_REFLECT);
